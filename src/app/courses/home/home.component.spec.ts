@@ -2,13 +2,12 @@ import { CoursesService } from './../services/courses.service';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { CoursesModule } from './../courses.module';
 import { DebugElement } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync, fakeAsync, flush, async } from '@angular/core/testing';
 import { HomeComponent } from './home.component';
 import { setupCourses } from '../common/setup-test-data';
 import { By } from '@angular/platform-browser';
 import { of } from 'rxjs';
 import { click } from '../common/test-utils';
-import { async } from 'rxjs/internal/scheduler/async';
 
 describe(`${HomeComponent.name}`, () => {
 
@@ -22,6 +21,7 @@ describe(`${HomeComponent.name}`, () => {
   const advancedCourses = setupCourses()
     .filter(course => course.category === 'ADVANCED');
 
+    // beforeEach(async(() => {
   beforeEach(waitForAsync(() => {
 
     const courseServiceSpy = jasmine.createSpyObj('CoursesService', ['findAllCourses']);
@@ -73,16 +73,42 @@ describe(`${HomeComponent.name}`, () => {
     expect(tabs.length).toBe(2, 'Expected to find 2 tabs');
   });
 
-  it('should display advanced courses when tab clicked', () => {
+  it('should display advanced courses when tab clicked', fakeAsync(() => {
+
+    coursesService.findAllCourses.and.returnValue(of(setupCourses()));
+
+    fixture.detectChanges();
+
+    const tabs = el.queryAll(By.css('.mat-tab-label'));
+
+    click(tabs[1]);
+
+    fixture.detectChanges();
+
+    flush();
+
+    const cardTitles = el.queryAll(By.css('.mat-tab-body-active .mat-card-title'));
+
+    expect(cardTitles.length).toBeGreaterThan(0, 'Could not find card titles');
+
+    expect(cardTitles[0].nativeElement.textContent).toContain("Angular Security Course");
+    expect(cardTitles[0].nativeElement.textContent).toContain("Web Security Fundamentals");
+  }));
+
+
+  it('should display advanced courses when tab clicked - async', async(() => {
+
     coursesService.findAllCourses.and.returnValue(of(setupCourses()));
     fixture.detectChanges();
     const tabs = el.queryAll(By.css('.mat-tab-label'));
     click(tabs[1]);
     fixture.detectChanges();
-    const cardTitles = el.queryAll(By.css('.mat-card-title'));
-    expect(cardTitles.length).toBeGreaterThan(0, 'Could not find card titles');
-    expect(cardTitles[0].nativeElement.textContent)
-      .toContain('Angular Security Course');
+    fixture.whenStable().then(() => {
+      const cardTitles = el.queryAll(By.css('.mat-tab-body-active .mat-card-title'));
 
-  });
+      expect(cardTitles.length).toBeGreaterThan(0, 'Could not find card titles');
+      expect(cardTitles[0].nativeElement.textContent).toContain("Angular Security Course");
+      expect(cardTitles[0].nativeElement.textContent).toContain("Web Security Fundamentals");
+    });
+  }));
 });
