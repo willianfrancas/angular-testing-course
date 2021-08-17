@@ -2,7 +2,7 @@ import { Course } from './../model/course';
 import { COURSES, findLessonsForCourse } from './../../../../server/db-data';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { CoursesService } from "./courses.service";
+import { CoursesService } from './courses.service';
 import { HttpErrorResponse } from '@angular/common/http';
 
 describe(`${CoursesService.name}`, () => {
@@ -22,7 +22,7 @@ describe(`${CoursesService.name}`, () => {
 
     coursesService = TestBed.inject(CoursesService);
     httpTestingController = TestBed.inject(HttpTestingController);
-  })
+  });
 
   it('should retrieve all courses', () => {
     coursesService.findAllCourses()
@@ -30,15 +30,15 @@ describe(`${CoursesService.name}`, () => {
 
         expect(courses).toBeTruthy('No courses returned');
         expect(courses.length).toBe(12, 'incorrect number of courses');
-        const course = courses.find(courses => courses.id === 12);
+        const course = courses.find(coursesF => coursesF.id === 12);
         expect(course.titles.description).toBe('Angular Testing Course');
 
       });
 
-    const req = httpTestingController.expectOne('/api/courses');
-    expect(req.request.method).toEqual('GET');
+    const reqs = httpTestingController.expectOne('/api/courses');
+    expect(reqs.request.method).toEqual('GET');
 
-    req.flush({
+    reqs.flush({
       payload: Object.values(COURSES),
     });
 
@@ -52,52 +52,52 @@ describe(`${CoursesService.name}`, () => {
       expect(course.id).toBe(courseId, 'wrong course id');
     });
 
-    const req = httpTestingController.expectOne(`/api/courses/${courseId}`);
-    expect(req.request.method).toEqual('GET');
-    req.flush(COURSES[courseId]);
+    const reqC = httpTestingController.expectOne(`/api/courses/${courseId}`);
+    expect(reqC.request.method).toEqual('GET');
+    reqC.flush(COURSES[courseId]);
   });
 
 
   it(`should save the course data`, () => {
-    const course: Partial<Course> = {
+    const courseObj: Partial<Course> = {
       id: 3,
       titles: {
         description: 'Testing Course',
       }
     };
 
-    coursesService.saveCourse(course.id, course).subscribe(course => {
-      expect(course.id).toBe(3);
+    coursesService.saveCourse(courseObj.id, courseObj).subscribe(courseS => {
+      expect(courseS.id).toBe(3);
     });
 
-    const req = httpTestingController.expectOne(`/api/courses/${course.id}`);
-    expect(req.request.method).toEqual('PUT');
-    expect(req.request.body.titles.description).toEqual(course.titles.description);
+    const reqI = httpTestingController.expectOne(`/api/courses/${courseObj.id}`);
+    expect(reqI.request.method).toEqual('PUT');
+    expect(reqI.request.body.titles.description).toEqual(courseObj.titles.description);
 
-    req.flush({
-      ...COURSES[course.id],
-      ...course
+    reqI.flush({
+      ...COURSES[courseObj.id],
+      ...courseObj
     });
 
   });
 
   it('should give an error if save couse fails', () => {
-    const course: Partial<Course> = {
+    const courseObjf: Partial<Course> = {
       id: 3,
       titles: {
         description: 'Testing Course',
       }
     };
-    coursesService.saveCourse(course.id, course).subscribe(
+    coursesService.saveCourse(courseObjf.id, courseObjf).subscribe(
       () => fail('the save course operation should have failed'),
       (error: HttpErrorResponse) => {
         expect(error.status).toBe(500);
       });
 
-    const req = httpTestingController.expectOne(`/api/courses/${course.id}`);
-    expect(req.request.method).toEqual('PUT');
+    const reqO = httpTestingController.expectOne(`/api/courses/${courseObjf.id}`);
+    expect(reqO.request.method).toEqual('PUT');
 
-    req.flush('Save course failed', { status: 500, statusText: 'Internal Server Error' });
+    reqO.flush('Save course failed', { status: 500, statusText: 'Internal Server Error' });
 
   });
 
@@ -108,20 +108,20 @@ describe(`${CoursesService.name}`, () => {
       expect(lesson.length).toBe(3);
     });
 
-    const req = httpTestingController.expectOne(req => req.url === `/api/lessons`);
-    expect(req.request.method).toBe("GET");
-    expect(req.request.params.get("courseId")).toEqual(String(lessonId));
-    expect(req.request.params.get("filter")).toEqual('');
-    expect(req.request.params.get("sortOrder")).toEqual('asc');
-    expect(req.request.params.get("pageNumber")).toEqual('0');
-    expect(req.request.params.get("pageSize")).toEqual('3');
+    const reqL = httpTestingController.expectOne(req => req.url === `/api/lessons`);
+    expect(reqL.request.method).toBe('GET');
+    expect(reqL.request.params.get('courseId')).toEqual(String(lessonId));
+    expect(reqL.request.params.get('filter')).toEqual('');
+    expect(reqL.request.params.get('sortOrder')).toEqual('asc');
+    expect(reqL.request.params.get('pageNumber')).toEqual('0');
+    expect(reqL.request.params.get('pageSize')).toEqual('3');
 
-    req.flush({
+    reqL.flush({
       payload: findLessonsForCourse(lessonId).slice(0, 3),
     });
   });
 
   afterEach(() => {
     httpTestingController.verify();
-  })
+  });
 });

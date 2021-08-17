@@ -1,6 +1,6 @@
 import { LoggerService } from './logger.service';
 import { TestBed } from '@angular/core/testing';
-import { CalculatorService } from "./calculator.service";
+import { CalculatorService } from './calculator.service';
 
 describe(`${CalculatorService.name}`, () => {
 

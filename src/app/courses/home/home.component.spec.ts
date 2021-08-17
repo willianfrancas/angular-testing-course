@@ -21,7 +21,7 @@ describe(`${HomeComponent.name}`, () => {
   const advancedCourses = setupCourses()
     .filter(course => course.category === 'ADVANCED');
 
-    // beforeEach(async(() => {
+  // beforeEach(async(() => {
   beforeEach(waitForAsync(() => {
 
     const courseServiceSpy = jasmine.createSpyObj('CoursesService', ['findAllCourses']);
@@ -91,12 +91,12 @@ describe(`${HomeComponent.name}`, () => {
 
     expect(cardTitles.length).toBeGreaterThan(0, 'Could not find card titles');
 
-    expect(cardTitles[0].nativeElement.textContent).toContain("Angular Security Course");
-    expect(cardTitles[0].nativeElement.textContent).toContain("Web Security Fundamentals");
+    expect(cardTitles[0].nativeElement.textContent).toContain('Angular Security Course');
+    expect(cardTitles[0].nativeElement.textContent).toContain('Web Security Fundamentals');
   }));
 
 
-  it('should display advanced courses when tab clicked - async', async(() => {
+  it('should display advanced courses when tab clicked - async', waitForAsync(() => {
 
     coursesService.findAllCourses.and.returnValue(of(setupCourses()));
     fixture.detectChanges();
@@ -107,8 +107,8 @@ describe(`${HomeComponent.name}`, () => {
       const cardTitles = el.queryAll(By.css('.mat-tab-body-active .mat-card-title'));
 
       expect(cardTitles.length).toBeGreaterThan(0, 'Could not find card titles');
-      expect(cardTitles[0].nativeElement.textContent).toContain("Angular Security Course");
-      expect(cardTitles[0].nativeElement.textContent).toContain("Web Security Fundamentals");
+      expect(cardTitles[0].nativeElement.textContent).toContain('Angular Security Course');
+      expect(cardTitles[0].nativeElement.textContent).toContain('Web Security Fundamentals');
     });
   }));
 });
