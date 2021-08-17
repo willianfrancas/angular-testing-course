@@ -557,5 +557,5 @@ export function findCourseById(courseId: number) {
 }
 
 export function findLessonsForCourse(courseId: number) {
-  return Object.values(LESSONS).filter(lesson => lesson.courseId == courseId);
+  return Object.values(LESSONS).filter(lesson => lesson.courseId === courseId);
 }
